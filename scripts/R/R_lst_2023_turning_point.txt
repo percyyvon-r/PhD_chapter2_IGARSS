@@ -1,0 +1,80 @@
+library(tidyverse)
+library(mgcv)
+
+df <- read_csv("C:/Users/percy/Documents/studies/data/igars_2026/table/lst_2023.csv")
+
+df <- df %>%  filter(distance < 31)
+
+df <- df %>% mutate(direction = as.character(direction))
+
+# Compute cubic smoothing spline predictions per direction
+df_spline <- df %>%
+  group_by(direction) %>%
+  arrange(distance, .by_group = TRUE) %>%   # <-- IMPORTANT
+  do({
+    fit <- gam(mean_lst ~ s(distance, bs = "cs"), data = .)
+    pred <- predict(fit, newdata = data.frame(distance = .$distance))
+    
+    # Find the index where distance == 0
+    idx0 <- which(.$distance == 0)
+    
+    # Replace spline value at distance=0 with the true observed value
+    if (length(idx0) == 1) {
+      pred[idx0] <- .$mean_lst[idx0]
+    }
+    
+    data.frame(distance = .$distance, mean_lst = pred, direction = .$direction)
+  })
+
+# Plot only the smoothed curves
+ggplot(df_spline, aes(
+  x = distance,
+  y = mean_lst,
+  color = direction,
+  group = direction
+)) +
+  geom_line(size = 1.2) +   # sets all lines to size 1.2 
+  
+  # Colours
+  # Colours
+  scale_color_manual(values = c(
+    "255" = "#03b6ca",
+    "285" = "#2cc6a4",
+    "315"  = "#63cf6c",
+    "345" = "#b7c532",
+    "15"  = "#f1bc3a",
+    "45"   = "#f8d82b",
+    "75"  = "#f9fb12"
+  )) +
+  
+  # X axis labels every 2 units
+  scale_x_continuous(
+    breaks = seq(0, max(df_spline$distance), by = 5),     # major ticks every 5
+    minor_breaks = seq(0, max(df_spline$distance), by = 1), # grid every 1 unit
+    expand = c(0, 0)
+  )+ 
+  
+  labs(
+    x = "No. of buffer",
+    y = expression(LST~(degree*C)),
+    color = "Bearing",
+    size = "Bearing"
+  ) +
+  
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.title.x = element_text(size = 24, face = "bold"),
+    axis.title.y = element_text(size = 24, face = "bold"),
+    axis.text.x  = element_text(size = 20),
+    axis.text.y  = element_text(size = 20),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+    panel.background = element_rect(fill = "white", color = "grey"),
+    plot.background  = element_rect(fill = "white", color = NA),
+    panel.border     = element_rect(color = "grey", fill = NA, size = 1),
+    plot.margin = margin(5, 10, 5, 0),
+    panel.grid.minor.x = element_line(colour = "grey85"),  # light minor gridlines
+    panel.grid.major.x = element_line(colour = "grey75")
+  )
+# Save figure
+ggsave("lst_2023_turning_point.png", width = 12, height = 6, dpi = 300)

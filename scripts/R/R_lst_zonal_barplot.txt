@@ -1,0 +1,38 @@
+# Load ggplot2
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+# Read your CSV file
+df <- read_csv("C:/Users/percy/Documents/studies/data/igars_2026/table/lst_zonal_lc_season_csv.csv")
+
+# Custom colors for seasons
+lc_colors <- c("Summer" = "#FFA77F",
+               "Winter" = "#ABCD66")
+
+# Grouped bar plot
+ggplot(df, aes(x = lc, y = mean, fill = season)) +
+  geom_bar(stat = "identity", color = "black", width = 0.7, position = position_dodge(width = 0.8)) +
+  geom_errorbar(aes(ymin = mean - std, ymax = mean + std),
+                width = 0.2,
+                position = position_dodge(width = 0.8)) +
+  ylab("Mean LST (°C)") +
+  xlab("Land Cover") +
+  scale_fill_manual(values = lc_colors, name = "Season") +
+theme_minimal() +
+  theme(
+    axis.title.x = element_text(size = 14, face = "bold"),
+    axis.title.y = element_text(size = 14, face = "bold"),
+    axis.text.x  = element_text(size = 14, angle = 30, hjust = 1),
+    axis.text.y  = element_text(size = 14),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+    panel.background = element_rect(fill = "white", color = NA),
+    plot.background  = element_rect(fill = "white", color = NA),
+    plot.margin = margin(5, 10, 5, 0),
+    legend.text = element_text(size = 12),      # increase legend text
+    legend.title = element_text(size = 14),     # increase legend title
+    legend.key.size = unit(1.5, "lines")        # increase legend key size
+  )
+ 
+# Save figure
+ggsave("bar_plot_lst.png", width = 12, height = 6, dpi = 300)
