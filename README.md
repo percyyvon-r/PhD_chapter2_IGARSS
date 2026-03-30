@@ -1,6 +1,6 @@
 # PhD Chapter 2: IGARSS - Defining Background Rural Areas for Surface Urban Heat Island analysis using directional ring profiling of summer and winter Land Surface Temperature along the urban–rural gradient 
 
-This repository contains the analysis code and data for Chapter 2 of my PhD thesis, focusing on Land Surface Temperature (LST) variations between summer and winter seasons across different land cover types. The work is prepared for presentation at the IEEE International Geoscience and Remote Sensing Symposium (IGARSS).
+This repository contains the analysis code and data for Chapter 2 of my PhD thesis, focusing on Land Surface Temperature (LST) variations between summer and winter seasons across different land cover types. The work is prepared for presentation at the IEEE International Geoscience and Remote Sensing Symposium (IGARSS: Washington DC 9-14 August 2026) https://2026.ieeeigarss.org/.
 
 ## Project Overview
 
